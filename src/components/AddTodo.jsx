@@ -26,7 +26,7 @@ export default function AddTodo({isVisible, todoObj={}, handleChange =[], handle
                     ></TextArea>
 
                     <div className="flex justify-end">
-                        {!isEdit ? <Button onClick={handleSubmit}>Save</Button> : <Button onClick={handleEditTodo}>Update</Button>  }
+                        {!isEdit ? <Button onClick={handleSubmit}>Save</Button> : <Button onClick={()=>handleEditTodo(todoObj)}>Update</Button>  }
                     </div>
                 </div> )
             }

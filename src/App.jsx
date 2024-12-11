@@ -14,7 +14,7 @@ function App() {
   const[todo, setTodo] = useState({
         title: "",
         description: "",
-        id: nextId
+        id: null
     });
 
   const [isLoading, setIsLoading] = useState(false)
@@ -59,7 +59,7 @@ function App() {
     function handleDelete(id){
          const remainingTodoItems =  todoItems.filter(item => item.id !== id)
          setTodoItems(remainingTodoItems)
-        setOriginalTodoItems(remainingTodoItems)
+         setOriginalTodoItems(remainingTodoItems)
     }
 
     function handleChangeSearchText(e) {
@@ -81,13 +81,31 @@ function App() {
         }, 1000)
     }
 
-    function handleEditTodo(){
-        toggleVisibility();
+    function handleEditTodo(todoObj){
+        const editedTodoList = todoItems.map((item) => {
+            if(item.id === todoObj.id){
+                return todoObj
+            }else{
+                return item
+            }
+        })
+
+        setTodoItems(editedTodoList)
+        setOriginalTodoItems(editedTodoList)
+
+        setTodo({
+            ...todo,
+            description: "",
+            title: "",
+        })
+        setIsVisible(false)
+        setIsEdit(false)
     }
 
     function changeToEditMode(todo){
         setTodo(todo)
-        console.log(todo)
+        setIsEdit(true)
+        setIsVisible(true)
     }
 
   return (
@@ -110,6 +128,7 @@ function App() {
             handleChangeSearchText={handleChangeSearchText}
             searchText={searchText}
             changeToEditMode={changeToEditMode}
+            isEdit={isEdit}
         />
     </div>
   )
