@@ -30,29 +30,29 @@ function TodoList({onChangeVisibility, isVisible, todoList, handleDelete, isLoad
                         <div className="flex flex-col gap-2">
                             {
                                 todoList.map((todo) => {
-                                    return <div key={todo.id}
-                                                className="bg-slate-100 border-l-4 border-blue-700 rounded-sm p-2 flex gap-3">
-                                        <div className="flex flex-col gap-1 flex-1">
-                                            <h3 className="text-[16px]">{todo.title}</h3>
-                                            <p className="text-xs">{todo.id} - {todo.description}</p>
-                                        </div>
-                                        <div className="text-white flex gap-2 items-end p-1">
-                                            {
-                                                !isEdit &&
-                                                <Pencil
-                                                    size={18}
-                                                    className="stroke-blue-600 hover:cursor-pointer"
-                                                    onClick={()=>changeToEditMode(todo)}
-                                                />
-                                            }
+                                    return <div key={todo.id} className="bg-slate-100 border-l-4 border-blue-700 rounded-sm p-2 flex gap-2">
+                                                <div className="flex flex-col gap-1 flex-1">
+                                                    {/*{todo.id}*/}
+                                                    <h3 className="text-[16px]">{todo.title}</h3>
+                                                    <p className="text-xs">{todo.description}</p>
+                                                </div>
+                                                <div className="text-white flex gap-2 items-end p-1">
+                                                    {
+                                                        !isEdit &&
+                                                        <Pencil
+                                                            size={18}
+                                                            className="stroke-blue-600 hover:cursor-pointer"
+                                                            onClick={()=>changeToEditMode(todo)}
+                                                        />
+                                                    }
 
-                                            <Trash2
-                                                size={18}
-                                                className="stroke-red-600 hover:cursor-pointer"
-                                                onClick={() => handleDelete(todo.id)}
-                                            />
-                                        </div>
-                                    </div>
+                                                    <Trash2
+                                                        size={18}
+                                                        className="stroke-red-600 hover:cursor-pointer"
+                                                        onClick={() => handleDelete(todo.id)}
+                                                    />
+                                                </div>
+                                          </div>
                                 })
                             }
                         </div>

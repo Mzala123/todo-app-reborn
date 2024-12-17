@@ -1,6 +1,6 @@
 import AddTodo from "./components/AddTodo.jsx";
 import TodoList from "./components/TodoList.jsx";
-import {useState} from "react";
+import {useReducer, useState} from "react";
 
 
 let nextId = 1
@@ -9,8 +9,10 @@ function App() {
 
   const[isVisible, setIsVisible] = useState(false);
 
-  const[todoItems, setTodoItems] = useState([])
-  const[originalTodoItems, setOriginalTodoItems] =  useState([])
+  const[todoItems, dispatch] = useReducer(todoDispatch,[])
+  const[originalTodoItems, dispatcher] =  useReducer(todoDispatch,[])
+
+
   const[todo, setTodo] = useState({
         title: "",
         description: "",
@@ -34,73 +36,98 @@ function App() {
         })
     }
 
-    function handleSubmit(e){
+    function handleSubmit(e, todoObj){
         e.preventDefault();
         if(todo.title && todo.description){
-            const todoObject = {
-                title: todo.title,
-                description: todo.description,
-                id: nextId++,
-            }
-            setTodoItems([...todoItems, todoObject])
-            setOriginalTodoItems([...originalTodoItems, todoObject])
-            toggleVisibility()
+              todoObj = {
+                 title: todo.title,
+                 description: todo.description,
+                 id: nextId++
+             }
+            dispatch(
+                {
+                    type: "added",
+                    payload: todoObj
+                })
+
+            dispatcher(
+                {
+                    type: "added",
+                    payload: todoObj
+                }
+            )
         }else{
-            console.log("Fill in mandatory fields")
+            console.log("Fill in the mandotory fields")
         }
-        setTodo({
-            ...todo,
-            description: "",
-            title: "",
-        })
+
+        setTodo(
+            {
+                ...todoObj,
+                description: "",
+                title: ""
+            }
+        )
+
     }
 
 
     function handleDelete(id){
-         const remainingTodoItems =  todoItems.filter(item => item.id !== id)
-         setTodoItems(remainingTodoItems)
-         setOriginalTodoItems(remainingTodoItems)
+        dispatch({
+            type: "deleted",
+            id: id
+        })
     }
+
+
 
     function handleChangeSearchText(e) {
         setSearchText(e.target.value)
     }
 
     function handleSearch(searchItem) {
-        setIsLoading(true)
+      setIsLoading(true)
         setTimeout(()=>{
-            if (!searchItem) {
-                setTodoItems(originalTodoItems);
-            } else {
-                const foundTodos = todoItems.filter((todo) => {
-                    return todo.title.toLowerCase().includes(searchItem.toLowerCase()) || todo.description.toLowerCase().includes(searchItem.toLowerCase())
-                })
-                setTodoItems(foundTodos)
-            }
+            dispatch(
+                {
+                    type: "search",
+                    searchItem: searchItem,
+                    originalItems : originalTodoItems
+                }
+            )
             setIsLoading(false)
         }, 1000)
+
     }
 
     function handleEditTodo(todoObj){
-        const editedTodoList = todoItems.map((item) => {
-            if(item.id === todoObj.id){
-                return todoObj
-            }else{
-                return item
+        dispatch(
+            {
+                type: "edited",
+                payload: todoObj
             }
-        })
+        )
 
-        setTodoItems(editedTodoList)
-        setOriginalTodoItems(editedTodoList)
+        dispatcher(
+            {
+                type: "edited",
+                payload: todoObj
+            }
+        )
 
-        setTodo({
-            ...todo,
-            description: "",
-            title: "",
-        })
+        setTodo(
+            {
+                ...todoObj,
+                description: "",
+                title: ""
+            }
+        )
+
         setIsVisible(false)
         setIsEdit(false)
     }
+
+
+
 
     function changeToEditMode(todo){
         setTodo(todo)
@@ -135,3 +162,44 @@ function App() {
 }
 
 export default App
+
+
+function todoDispatch(todoItems, action){
+    switch(action.type){
+        case "added":
+        {
+            return  [
+                ...todoItems,
+                action.payload
+            ]
+        }
+        case "edited":
+        {
+            return todoItems.map((item) => {
+                if(item.id === action.payload.id){
+                    return action.payload
+                }else{
+                    return item
+                }
+            })
+        }
+        case "deleted":
+        {
+            return todoItems.filter((todo)=>{
+                return todo.id !== action.id
+            })
+        }
+        case "search":
+        {
+            if(!action.searchItem){
+                return action.originalItems;
+            }else{
+                return  todoItems.filter((todo) => {
+                    return todo.title.toLowerCase().includes(action.searchItem.toLowerCase()) ||
+                        todo.description.toLowerCase().includes(action.searchItem.toLowerCase())
+                })
+            }
+        }
+    }
+
+}
